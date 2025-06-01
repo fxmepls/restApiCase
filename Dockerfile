@@ -12,6 +12,7 @@ RUN go mod download
 COPY . .
 
 # Собираем приложение
+WORKDIR /app/internal
 RUN go build -o main .
 
 # Указываем команду, которую нужно выполнить при запуске контейнера
