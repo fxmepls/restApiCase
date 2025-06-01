@@ -14,11 +14,7 @@ func main() {
 	defer database.Close()
 	db.RunMigrations(database)
 
-	http.HandleFunc("/sum", handlers.SumHandler)
-	http.HandleFunc("/multiply", handlers.MultiplyHandler)
-
-	http.HandleFunc("/users", handlers.CreateUserHandler(database))
-	http.HandleFunc("/users/", handlers.GetUserHandler(database))
+	mux := handlers.SetupRoutes(database)
 
 	fmt.Println("The server is running on port 8080")
 	fmt.Printf(`
@@ -48,6 +44,11 @@ func main() {
    - URL: http://localhost:8080/users/1
    - Headers: Content-Type: application/json
 
+   - Method: PUT
+   - URL: http://localhost:8080/users/1
+   - Headers: Content-Type: application/json
+   - Body (raw JSON): {"name":"Alice"}
+
 4. Sum:
 	- POST
 	- URL: http://localhost:8080/sum?a=5&b=9
@@ -56,5 +57,5 @@ func main() {
 	- POST
 	- URL: http://localhost:8080/multiply?a=5&b=9
 `)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", mux)
 }

@@ -16,3 +16,8 @@ func GetUser(db *sql.DB, id int) (models.User, error) {
 	err := db.QueryRow("SELECT id, name FROM users WHERE id = $1", id).Scan(&user.ID, &user.Name)
 	return user, err
 }
+func UpdateUser(db *sql.DB, id int, name string) (models.User, error) {
+	var user models.User
+	err := db.QueryRow("UPDATE users SET name = $1 WHERE id = $2 RETURNING id, name", name, id).Scan(&user.ID, &user.Name)
+	return user, err
+}

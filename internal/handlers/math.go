@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -35,9 +34,7 @@ func SumHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := models.Result{A: a, B: b, Value: a + b}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
-
+	utils.RespondWithJSON(w, http.StatusOK, res)
 }
 
 func MultiplyHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +46,5 @@ func MultiplyHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := models.Result{A: a, B: b, Value: a * b}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
-
+	utils.RespondWithJSON(w, http.StatusOK, res)
 }

@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"restApiCase/internal/models"
 	"restApiCase/internal/repository"
@@ -14,18 +11,19 @@ import (
 	"strings"
 )
 
+func parseUserID(w http.ResponseWriter, path string) (int, bool) {
+	idStr := strings.TrimPrefix(path, "/users/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.HandleError(w, http.StatusBadRequest, "Invalid user ID")
+		return 0, false
+	}
+	return id, true
+}
+
 func CreateUserHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		bodyBytes, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			utils.HandleError(w, http.StatusBadRequest, "Failed to read body")
-			return
-		}
-		fmt.Println("Request body:", string(bodyBytes))
-
-		// теперь восстанови тело, чтобы json.Decoder мог его прочитать
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		input := models.UserInput{}
+		var input models.UserInput
 		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 			utils.HandleError(w, http.StatusBadRequest, "Invalid input")
 			return
@@ -35,19 +33,17 @@ func CreateUserHandler(db *sql.DB) http.HandlerFunc {
 			utils.HandleError(w, http.StatusInternalServerError, "Failed to create user")
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		utils.RespondWithJSON(w, http.StatusOK, user)
 	}
 }
 
 func GetUserHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		idStr := strings.TrimPrefix(r.URL.Path, "/users/")
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			utils.HandleError(w, http.StatusBadRequest, "Invalid user ID")
+		id, ok := parseUserID(w, r.URL.Path)
+		if !ok {
 			return
 		}
+
 		user, err := repository.GetUser(db, id)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -57,7 +53,30 @@ func GetUserHandler(db *sql.DB) http.HandlerFunc {
 			}
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		utils.RespondWithJSON(w, http.StatusOK, user)
+	}
+}
+
+func UpdateUserHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, ok := parseUserID(w, r.URL.Path)
+		if !ok {
+			return
+		}
+		input := models.UserInput{}
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			utils.HandleError(w, http.StatusBadRequest, "Invalid input")
+			return
+		}
+		user, err := repository.UpdateUser(db, id, input.Name)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				utils.HandleError(w, http.StatusNotFound, "User not found")
+			} else {
+				utils.HandleError(w, http.StatusInternalServerError, "Failed to update user")
+			}
+			return
+		}
+		utils.RespondWithJSON(w, http.StatusOK, user)
 	}
 }
