@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"net/http"
 	"restApiCase/internal/utils"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func SetupRoutes(db *sql.DB) *http.ServeMux {
+func SetupRoutes(db *sql.DB, redisClient *redis.Client) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/sum", SumHandler)
@@ -25,5 +27,7 @@ func SetupRoutes(db *sql.DB) *http.ServeMux {
 	})
 
 	mux.HandleFunc("/test", RateLimitedTestHandler())
+	mux.HandleFunc("/cookie", RateLimitedTestCookieHandler)
+	mux.HandleFunc("/redis", RateLimitedRedisHandler(redisClient))
 	return mux
 }

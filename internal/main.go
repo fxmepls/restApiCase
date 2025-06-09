@@ -10,11 +10,14 @@ import (
 
 func main() {
 
-	database := db.Connect()
+	database := db.PgConnect()
 	defer database.Close()
 	db.RunMigrations(database)
 
-	mux := handlers.SetupRoutes(database)
+	redisClient := db.RedisConnect()
+	defer redisClient.Close()
+
+	mux := handlers.SetupRoutes(database, redisClient)
 
 	fmt.Println("The server is running on port 8080")
 	fmt.Printf(`
