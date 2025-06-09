@@ -28,6 +28,12 @@ http://localhost:8080
 **Метод:** POST  
 **Описание:** Создаёт нового пользователя с указанным именем.
 
+**Пример:**
+
+```bash
+http://localhost:8080/users
+```
+
 **Тело запроса (JSON):**
 
 ```json
@@ -42,13 +48,23 @@ http://localhost:8080
 **Метод:** GET  
 **Описание:** Получить данные пользователя по ID.
 
-**Тело запроса (JSON):**
+**Пример:**
+
+```bash
+http://localhost:8080/users/1
+```
 
 ## 3. Обновление пользователя
 
 **URL:** `/users/{id}`  
 **Метод:** PUT  
 **Описание:** Обновляет имя пользователя по ID.
+
+**Пример:**
+
+```bash
+http://localhost:8080/users/1
+```
 
 **Тело запроса (JSON):**
 
@@ -67,7 +83,7 @@ http://localhost:8080
 **Пример:**
 
 ```bash
-"http://localhost:8080/sum?a=5&b=9"
+http://localhost:8080/sum?a=5&b=9
 ```
 
 ## 5. Умножение чисел 
@@ -79,7 +95,7 @@ http://localhost:8080
 **Пример:**
 
 ```bash
-"http://localhost:8080/multiply?a=5&b=9"
+http://localhost:8080/multiply?a=5&b=9
 ```
 
 ## 6. Тестовый rate limit 
@@ -91,7 +107,7 @@ http://localhost:8080
 **Пример:**
 
 ```bash
-"http://localhost:8080/test"
+http://localhost:8080/test
 ```
 
 ## 7. Rate limit с cookie
@@ -105,7 +121,7 @@ http://localhost:8080
 **Пример:**
 
 ```bash
-"http://localhost:8080/cookie"
+http://localhost:8080/cookie
 ```
 
 ## 8. Rate limit с Redis 
@@ -118,5 +134,5 @@ http://localhost:8080
 **Пример:**
 
 ```bash
-"http://localhost:8080/redis"
+http://localhost:8080/redis
 ```
