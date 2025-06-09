@@ -23,5 +23,7 @@ func SetupRoutes(db *sql.DB) *http.ServeMux {
 			utils.HandleError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		}
 	})
+
+	mux.HandleFunc("/test", RateLimitedTestHandler())
 	return mux
 }
